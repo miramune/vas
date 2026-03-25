@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>イメージ評価</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: sans-serif; max-width: 720px; margin: 30px auto; padding: 15px; }
+h1 { text-align: center; }
+section { margin: 25px 0; }
+input[type=range] { width: 100%; }
+.label { display:flex; justify-content:space-between; font-size:0.9em; }
+.val { font-weight:bold; }
+button { padding:14px 28px; font-size:16px; display:block; margin:30px auto; }
+</style>
+</head>
+
+<body>
+
+<h1>イメージ評価</h1>
+
+<p>
+最も印象に残っている1つの出来事を思い浮かべてください。<br>
+今この瞬間の感覚で回答してください。
+</p>
+
+<!-- 研究者ID -->
+<section>
+<h3>研究者ID</h3>
+<input type="text" id="id" placeholder="例：A001">
+</section>
+
+<div id="questions"></div>
+
+<button onclick="sendData()">送信</button>
+
+<script>
+
+// ★ Googleフォーム完全一致（確定版）
+const entry = {
+  id: "entry.394329872",
+  pain: "entry.1497755319",
+  clarity: "entry.2024193822",
+  frequency: "entry.347232285",
+  anxiety: "entry.516073155",
+  anger: "entry.2043390953",
+  sadness: "entry.1624573494",
+  shame: "entry.1889843272",
+  guilt: "entry.504428172",
+  joy: "entry.382942845",
+  incompetent: "entry.44909707",
+  alone: "entry.1747841409",
+  danger: "entry.448335877",
+  coping: "entry.943567849",
+  support: "entry.312302051",
+  good: "entry.131277244"
+};
+
+// ★ 表示項目
+const items = [
+  {id:"pain", label:"苦痛度"},
+  {id:"clarity", label:"イメージの鮮明度"},
+  {id:"frequency", label:"過去1週間の想起回数"},
+  {id:"anxiety", label:"不安"},
+  {id:"anger", label:"怒り"},
+  {id:"sadness", label:"悲しみ"},
+  {id:"shame", label:"恥ずかしい"},
+  {id:"guilt", label:"罪悪感"},
+  {id:"joy", label:"幸福感"},
+  {id:"incompetent", label:"自分は何もできない"},
+  {id:"alone", label:"自分はひとりぼっち"},
+  {id:"danger", label:"世の中は危険だ"},
+  {id:"coping", label:"自分で対処できた"},
+  {id:"support", label:"周りの人を頼っていい"},
+  {id:"good", label:"自分はよくやった"}
+];
+
+// ★ UI生成
+const container = document.getElementById("questions");
+
+items.forEach(q=>{
+  const section = document.createElement("section");
+
+  section.innerHTML = `
+    <h3>${q.label}</h3>
+    <input type="range" min="0" max="100" step="1" id="${q.id}">
+    <div class="label"><span>0</span><span>100</span></div>
+    <div>現在の値：<span id="${q.id}_val" class="val">未選択</span></div>
+  `;
+
+  container.appendChild(section);
+
+  const slider = section.querySelector("input");
+  const val = section.querySelector(".val");
+
+  slider.addEventListener("input", ()=>{
+    val.textContent = slider.value;
+  });
+});
+
+// ★ 送信処理
+function sendData(){
+
+  const id = document.getElementById("id").value.trim();
+  if(!id){
+    alert("研究者IDを入力してください");
+    return;
+  }
+
+  const params = new URLSearchParams();
+  params.append(entry.id, id);
+
+  for(const q of items){
+    const val = document.getElementById(q.id).value;
+
+    if(val === ""){
+      alert("すべての項目に回答してください");
+      return;
+    }
+
+    params.append(entry[q.id], val);
+  }
+
+  fetch("https://docs.google.com/forms/d/e/1FAIpQLScCsqD2o9_O_kscqaftS9mvnyESkzIWi7fPy5dMB6BWg5zAyw/formResponse", {
+    method: "POST",
+    mode: "no-cors",
+    body: params
+  })
+  .then(()=>{
+    document.body.innerHTML = "<h2 style='text-align:center;'>送信完了しました</h2>";
+  })
+  .catch(()=>{
+    document.body.innerHTML = "<h2 style='text-align:center;'>送信完了（通信確認不可）</h2>";
+  });
+}
+
+</script>
+
+</body>
+</html>
