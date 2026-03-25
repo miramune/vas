@@ -5,13 +5,46 @@
 <title>イメージ評価</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body { font-family: sans-serif; max-width: 720px; margin: 30px auto; padding: 15px; }
+body {
+  font-family: sans-serif;
+  max-width: 720px;
+  margin: 30px auto;
+  padding: 15px;
+}
+
 h1 { text-align: center; }
+
 section { margin: 25px 0; }
-input[type=range] { width: 100%; }
-.label { display:flex; justify-content:space-between; font-size:0.9em; }
-.val { font-weight:bold; }
-button { padding:14px 28px; font-size:16px; display:block; margin:30px auto; }
+
+/* ★ 入力欄を大きく（重要） */
+input[type=text] {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-top: 8px;
+  box-sizing: border-box;
+}
+
+/* スライダー */
+input[type=range] {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+}
+
+.val { font-weight: bold; }
+
+button {
+  padding: 14px 28px;
+  font-size: 16px;
+  display: block;
+  margin: 30px auto;
+}
 </style>
 </head>
 
@@ -36,7 +69,7 @@ button { padding:14px 28px; font-size:16px; display:block; margin:30px auto; }
 
 <script>
 
-// ★ Googleフォーム完全一致（確定版）
+// ★ Googleフォーム完全一致（最終確定）
 const entry = {
   id: "entry.394329872",
   pain: "entry.1497755319",
@@ -56,7 +89,7 @@ const entry = {
   good: "entry.131277244"
 };
 
-// ★ 表示項目
+// ★ 項目
 const items = [
   {id:"pain", label:"苦痛度"},
   {id:"clarity", label:"イメージの鮮明度"},
@@ -93,6 +126,10 @@ items.forEach(q=>{
   const slider = section.querySelector("input");
   const val = section.querySelector(".val");
 
+  // ★ 初期値バイアス防止
+  slider.value = "";
+  val.textContent = "未選択";
+
   slider.addEventListener("input", ()=>{
     val.textContent = slider.value;
   });
@@ -102,6 +139,7 @@ items.forEach(q=>{
 function sendData(){
 
   const id = document.getElementById("id").value.trim();
+
   if(!id){
     alert("研究者IDを入力してください");
     return;
