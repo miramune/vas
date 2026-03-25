@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>イメージ評価</title>
+<title>学校でのつらい体験について</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
@@ -16,8 +16,8 @@ h1 { text-align: center; }
 
 section { margin: 25px 0; }
 
-/* ★ 入力欄を大きく（重要） */
-input[type=text] {
+/* テキスト・数値入力 */
+input[type=text], input[type=number] {
   width: 100%;
   padding: 12px;
   font-size: 16px;
@@ -50,17 +50,26 @@ button {
 
 <body>
 
-<h1>イメージ評価</h1>
+<h1>学校でのつらい体験について</h1>
 
 <p>
-最も印象に残っている1つの出来事を思い浮かべてください。<br>
-今この瞬間の感覚で回答してください。
+最も印象に残っている学校でのつらい体験を思い浮かべてください。<br>
 </p>
 
 <!-- 研究者ID -->
 <section>
 <h3>研究者ID</h3>
-<input type="text" id="id" placeholder="例：A001">
+<input type="text" id="id" placeholder="例：1">
+</section>
+
+<!-- frequency（記入式） -->
+<section>
+<h3>過去1週間にそのイメージを何回思い出しましたか</h3>
+<div style="display:flex; align-items:center; gap:10px;">
+  <span>1週間に</span>
+  <input type="number" id="frequency" min="0" placeholder="例：5">
+  <span>回</span>
+</div>
 </section>
 
 <div id="questions"></div>
@@ -69,7 +78,7 @@ button {
 
 <script>
 
-// ★ Googleフォーム完全一致（最終確定）
+// ★ Googleフォーム完全一致
 const entry = {
   id: "entry.394329872",
   pain: "entry.1497755319",
@@ -89,11 +98,10 @@ const entry = {
   good: "entry.131277244"
 };
 
-// ★ 項目
+// ★ VAS項目（frequency除外）
 const items = [
-  {id:"pain", label:"苦痛度"},
-  {id:"clarity", label:"イメージの鮮明度"},
-  {id:"frequency", label:"過去1週間の想起回数"},
+  {id:"pain", label:"学校でのつらい体験を思い出した時の苦痛度を教えてください"},
+  {id:"clarity", label:"そのイメージはどれくらいはっきりとしていますか"},
   {id:"anxiety", label:"不安"},
   {id:"anger", label:"怒り"},
   {id:"sadness", label:"悲しみ"},
@@ -126,7 +134,7 @@ items.forEach(q=>{
   const slider = section.querySelector("input");
   const val = section.querySelector(".val");
 
-  // ★ 初期値バイアス防止
+  // 初期値なし（バイアス防止）
   slider.value = "";
   val.textContent = "未選択";
 
@@ -139,14 +147,20 @@ items.forEach(q=>{
 function sendData(){
 
   const id = document.getElementById("id").value.trim();
-
   if(!id){
     alert("研究者IDを入力してください");
     return;
   }
 
+  const freq = document.getElementById("frequency").value;
+  if(freq === ""){
+    alert("想起回数を入力してください");
+    return;
+  }
+
   const params = new URLSearchParams();
   params.append(entry.id, id);
+  params.append(entry.frequency, freq);
 
   for(const q of items){
     const val = document.getElementById(q.id).value;
