@@ -16,7 +16,6 @@ h1 { text-align: center; }
 
 section { margin: 25px 0; }
 
-/* テキスト・数値入力 */
 input[type=text], input[type=number] {
   width: 100%;
   padding: 12px;
@@ -25,7 +24,6 @@ input[type=text], input[type=number] {
   box-sizing: border-box;
 }
 
-/* スライダー */
 input[type=range] {
   width: 100%;
   margin-top: 10px;
@@ -45,6 +43,17 @@ button {
   display: block;
   margin: 30px auto;
 }
+
+/* 教示スタイル */
+.instruction {
+  margin-top: 40px;
+  padding-top: 15px;
+  border-top: 2px solid #ccc;
+}
+
+.instruction h2 {
+  font-size: 18px;
+}
 </style>
 </head>
 
@@ -56,13 +65,11 @@ button {
 最も印象に残っている学校でのつらい体験を思い浮かべてください。<br>
 </p>
 
-<!-- 研究者ID -->
 <section>
 <h3>研究者ID</h3>
 <input type="text" id="id" placeholder="例：1">
 </section>
 
-<!-- frequency（記入式） -->
 <section>
 <h3>過去1週間にそのイメージを何回思い出しましたか</h3>
 <div style="display:flex; align-items:center; gap:10px;">
@@ -78,7 +85,6 @@ button {
 
 <script>
 
-// ★ Googleフォーム完全一致
 const entry = {
   id: "entry.394329872",
   pain: "entry.1497755319",
@@ -98,7 +104,6 @@ const entry = {
   good: "entry.131277244"
 };
 
-// ★ VAS項目（frequency除外）
 const items = [
   {id:"pain", label:"学校でのつらい体験を思い出した時の苦痛度を教えてください"},
   {id:"clarity", label:"そのイメージはどれくらいはっきりとしていますか"},
@@ -116,10 +121,30 @@ const items = [
   {id:"good", label:"自分はよくやった"}
 ];
 
-// ★ UI生成
 const container = document.getElementById("questions");
 
 items.forEach(q=>{
+
+  // ★ 感情セクションの教示（不安の前）
+  if(q.id === "anxiety"){
+    const instruction = document.createElement("section");
+    instruction.className = "instruction";
+    instruction.innerHTML = `
+      <h2>イメージについての感情とその点数を100点満点で教えてください。</h2>
+    `;
+    container.appendChild(instruction);
+  }
+
+  // ★ 意味セクションの教示（incompetentの前）
+  if(q.id === "incompetent"){
+    const instruction = document.createElement("section");
+    instruction.className = "instruction";
+    instruction.innerHTML = `
+      <h2>イメージについての意味とその点数を100点満点で教えてください。</h2>
+    `;
+    container.appendChild(instruction);
+  }
+
   const section = document.createElement("section");
 
   section.innerHTML = `
@@ -134,7 +159,6 @@ items.forEach(q=>{
   const slider = section.querySelector("input");
   const val = section.querySelector(".val");
 
-  // 初期値なし（バイアス防止）
   slider.value = "";
   val.textContent = "未選択";
 
@@ -143,7 +167,6 @@ items.forEach(q=>{
   });
 });
 
-// ★ 送信処理
 function sendData(){
 
   const id = document.getElementById("id").value.trim();
